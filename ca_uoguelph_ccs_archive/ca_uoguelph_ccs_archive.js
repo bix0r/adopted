@@ -62,6 +62,7 @@ CcsArchive.prototype.init = function () {
     CcsArchive.CCS_ARCHIVE_OLD_BY_DAYS = {id:"d", name:this.getMessage("archive_older_than_days")};
     CcsArchive.CCS_ARCHIVE_OLD_BY_MONTHS = {id:"m", name:this.getMessage("archive_older_than_month")};
     CcsArchive.CCS_ARCHIVE_OLD_BY_YEARS = {id:"y", name:this.getMessage("archive_older_than_year")};
+    this.detectArchiveFolder();
     // only the "Archive" folder id is kept
     this.archiveFolderId = null;
     // used as a sequence number when a folder with the same name already exists
@@ -69,6 +70,18 @@ CcsArchive.prototype.init = function () {
     // the saved preference on how to archive
     this.archiveBy = this.getUserProperty(CcsArchive.CCS_ARCHIVE_BY_PREFERENCE);
     this.runAutoArchive();
+};
+
+CcsArchive.prototype.detectArchiveFolder = function() {
+	// for debugging:this.setArchiveFolderId(null);
+	if (!this.getArchiveFolderId()) {
+		var path = "/" + this.getMessage("folder_archive");
+		var folder = {path:path};
+		this.getFolder(folder);
+		if (folder.id) {
+			this.setArchiveFolderId(folder.id);
+		}
+	}
 };
 
 /**
@@ -575,7 +588,7 @@ CcsArchive.prototype.organizeMessages = function(params) {
         // get the month folder
         if (CcsArchive.BY_MONTH === archiveBy) {
             var monthNumName = labels[i].split("-"); 
-            var displayName = monthNumName[1] + " - " + monthNumName[2];
+            var displayName = monthNumName[0] + "-" + monthNumName[1];
             folderInfo = {name: displayName, parent: folderInfo.id, path: archive.name + "/" + label + "/" + displayName};            
             this.getFolder(folderInfo);
         }
